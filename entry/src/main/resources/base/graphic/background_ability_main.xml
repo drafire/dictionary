@@ -3,5 +3,5 @@
        ohos:shape="rectangle">
     <solid
         ohos:color="#FFFFFF"/>
-    <stroke ohos:width="1vp" ohos:color="#ffff04"></stroke>
+    <stroke ohos:width="1vp" ohos:color="#1196EE"></stroke>
 </shape>
