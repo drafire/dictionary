@@ -2,6 +2,7 @@ package com.drafire.dictionary.slice;
 
 import com.drafire.dictionary.Dictionary;
 import com.drafire.dictionary.ResourceTable;
+import com.drafire.dictionary.Word;
 import ohos.aafwk.ability.AbilitySlice;
 import ohos.aafwk.content.Intent;
 import ohos.agp.components.Component;
@@ -10,6 +11,7 @@ import ohos.agp.components.Text;
 import ohos.agp.components.TextField;
 
 import java.io.IOException;
+import java.util.List;
 
 public class MainAbilitySlice extends AbilitySlice {
     private Dictionary dictionary;
@@ -43,6 +45,15 @@ public class MainAbilitySlice extends AbilitySlice {
                     //隐藏logo
                     imageLogo.setVisibility(Component.HIDE);
                     textResult.setVisibility(Component.VISIBLE);
+
+                    List<Word> list = dictionary.search(textField.getText());
+                    if (null != list && !list.isEmpty()) {
+                        String result="";
+                        for (Word word : list) {
+                            result += word.getMeanings();
+                        }
+                        textResult.setText(result);
+                    }
                 }
             });
 
