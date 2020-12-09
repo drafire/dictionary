@@ -11,8 +11,6 @@ import ohos.global.resource.Resource;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.Buffer;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,9 +74,10 @@ public class Dictionary {
         ResultSet resultSet = rdbStore.querySql("select * from t_dictionary where word =?", params);
         List<Word> list = new ArrayList<>();
         while (resultSet.goToNextRow()) {
-            Word w = new Word();
-            w.setMeanings(resultSet.getString(2));
-            list.add(w);
+            Word currentWord = new Word();
+            currentWord.setMeanings(resultSet.getString(2));
+            currentWord.setType(resultSet.getString(3));
+            list.add(currentWord);
         }
         //关掉数据库
         resultSet.close();

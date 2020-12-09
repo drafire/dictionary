@@ -39,21 +39,20 @@ public class MainAbilitySlice extends AbilitySlice {
         imageLogo = (Image) findComponentById(ResourceTable.Id_image);
         if (null != imageSearch) {
             imageSearch.setClickable(true);
-            imageSearch.setClickedListener(new Component.ClickedListener() {
-                @Override
-                public void onClick(Component component) {
-                    //隐藏logo
-                    imageLogo.setVisibility(Component.HIDE);
-                    textResult.setVisibility(Component.VISIBLE);
+            imageSearch.setClickedListener(component -> {
+                //隐藏logo
+                imageLogo.setVisibility(Component.HIDE);
+                textResult.setVisibility(Component.VISIBLE);
 
-                    List<Word> list = dictionary.search(textField.getText());
-                    if (null != list && !list.isEmpty()) {
-                        String result="";
-                        for (Word word : list) {
-                            result += word.getMeanings();
-                        }
-                        textResult.setText(result);
+                List<Word> list = dictionary.search(textField.getText());
+                if (null != list && !list.isEmpty()) {
+                    textResult.setText(null);
+                    for (Word word : list) {
+                        //使用append，可以解析html代码
+                        textResult.append(word.getType() + " " + word.getMeanings() + "\r\n");
                     }
+                } else {
+                    textResult.setText("本地词库没有该单词，正在连接网络查询...");
                 }
             });
 
