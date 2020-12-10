@@ -18,6 +18,16 @@
     "reqCapabilities": [
       "video_support"
     ],
+    "reqPermissions": [
+      {
+        "name": "ohos.permission.INTERNET",
+        "reason": "internet",
+        "usedScene":{
+          "ability": ["com.drafire.dictionary.MainAbility"],
+          "when": "always"
+        }
+      }
+    ],
     "deviceType": [
       "tv",
       "wearable"
