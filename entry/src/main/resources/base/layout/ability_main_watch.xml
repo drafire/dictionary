@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DirectionalLayout
+    xmlns:ohos="http://schemas.huawei.com/res/ohos"
+    ohos:height="match_parent"
+    ohos:width="match_parent"
+    ohos:orientation="vertical"
+    >
+
+    <TextField
+        ohos:id="$+id:text"
+        ohos:height="match_content"
+        ohos:width="match_parent"
+        ohos:background_element="$graphic:background_ability_main"
+        ohos:hint="请输入要查找的单词"
+        ohos:layout_alignment="vertical_center"
+        ohos:text_size="15vp"
+        ohos:top_margin="100vp"
+        ohos:left_margin="10vp"
+        ohos:right_margin="10vp"
+        >
+    </TextField>
+
+    <Image
+        ohos:id="$+id:btnSearch"
+        ohos:height="match_content"
+        ohos:layout_alignment="center"
+        ohos:width="100vp"
+        ohos:top_margin="10vp"
+        ohos:image_src="$media:1.jpg">
+    </Image>
+
+
+</DirectionalLayout>

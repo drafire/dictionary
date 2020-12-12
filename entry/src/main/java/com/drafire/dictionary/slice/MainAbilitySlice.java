@@ -5,7 +5,9 @@ import com.drafire.dictionary.ResourceTable;
 import com.drafire.dictionary.SearchWordCallback;
 import com.drafire.dictionary.Word;
 import ohos.aafwk.ability.AbilitySlice;
+import ohos.aafwk.ability.DeviceConfigInfo;
 import ohos.aafwk.content.Intent;
+import ohos.aafwk.content.IntentParams;
 import ohos.agp.components.Component;
 import ohos.agp.components.Image;
 import ohos.agp.components.Text;
@@ -13,9 +15,13 @@ import ohos.agp.components.TextField;
 import ohos.eventhandler.EventHandler;
 import ohos.eventhandler.EventRunner;
 import ohos.eventhandler.InnerEvent;
+import ohos.system.DeviceInfo;
 
+import java.io.Console;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Logger;
 
 public class MainAbilitySlice extends AbilitySlice {
     private Dictionary dictionary;
@@ -25,15 +31,19 @@ public class MainAbilitySlice extends AbilitySlice {
     private Image imageLogo;
     private static final int SEARCH_RESULT = 100;
 
+    private final static Logger logger = Logger.getLogger(MainAbilitySlice.class.getName());
+
+    private boolean isTv;
+
     private class SearchWordCallbackImpl implements SearchWordCallback {
 
         @Override
         public void onResult(List<Word> list) {
             //得到当前的线程的runner
-            EventRunner eventRunner=EventRunner.getMainEventRunner();
-            DictionaryEvenHandler dictionaryEvenHandler=new DictionaryEvenHandler(eventRunner,list);
+            EventRunner eventRunner = EventRunner.getMainEventRunner();
+            DictionaryEvenHandler dictionaryEvenHandler = new DictionaryEvenHandler(eventRunner, list);
             dictionaryEvenHandler.sendEvent(SEARCH_RESULT);
-            eventRunner=null;   //释放对象空间
+            eventRunner = null;   //释放对象空间
         }
     }
 
@@ -72,7 +82,16 @@ public class MainAbilitySlice extends AbilitySlice {
     @Override
     public void onStart(Intent intent) {
         super.onStart(intent);
-        super.setUIContent(ResourceTable.Layout_ability_main);
+        String deviceType = DeviceInfo.getDeviceType();
+        isTv = deviceType.equalsIgnoreCase("tv");
+        logger.info("设备是：" + deviceType);
+
+        if (isTv) {
+            super.setUIContent(ResourceTable.Layout_ability_main);
+        } else {
+            super.setUIContent(ResourceTable.Layout_ability_main_watch);
+        }
+
 
         dictionary = new Dictionary(this);
         try {
@@ -89,20 +108,30 @@ public class MainAbilitySlice extends AbilitySlice {
         if (null != imageSearch) {
             imageSearch.setClickable(true);
             imageSearch.setClickedListener(component -> {
-                //隐藏logo
-                imageLogo.setVisibility(Component.HIDE);
-                textResult.setVisibility(Component.VISIBLE);
                 List<Word> list = dictionary.search(textField.getText());
-                if (null != list && !list.isEmpty()) {
-                    textResult.setText(null);
-                    for (Word word : list) {
-                        //使用append，可以解析html代码
-                        textResult.append(word.getType() + " " + word.getMeanings() + "\r\n");
+                //隐藏logo
+                if (isTv) {
+                    imageLogo.setVisibility(Component.HIDE);
+                    textResult.setVisibility(Component.VISIBLE);
+                    if (null != list && !list.isEmpty()) {
+                        textResult.setText(null);
+                        for (Word word : list) {
+                            //使用append，可以解析html代码
+                            textResult.append(word.getType() + " " + word.getMeanings() + "\r\n");
+                        }
+                    } else {
+                        textResult.setText("本地词库没有该单词，正在连接网络查询...");
+                        dictionary.serachWebDict(textField.getText(), new SearchWordCallbackImpl());
                     }
                 } else {
-                    textResult.setText("本地词库没有该单词，正在连接网络查询...");
-                    dictionary.serachWebDict(textField.getText(),new SearchWordCallbackImpl());
+                    Intent searchResultIntent = new Intent();
+                    IntentParams intentParams = new IntentParams();
+                    intentParams.setParam("dictionaryResult", list);
+                    searchResultIntent.setParams(intentParams);
+                    present(new WatchSearchResultSlice(), searchResultIntent);
                 }
+
+
             });
 
         }
