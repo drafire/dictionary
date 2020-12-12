@@ -1,5 +1,6 @@
 package com.drafire.dictionary.slice;
 
+import com.drafire.dictionary.Dictionary;
 import com.drafire.dictionary.ResourceTable;
 import com.drafire.dictionary.Word;
 import ohos.aafwk.ability.AbilitySlice;
@@ -20,16 +21,18 @@ public class WatchSearchResultSlice extends AbilitySlice {
         text = (Text) findComponentById(ResourceTable.Id_text);
 
         Object dictionaryResult = intent.getParams().getParam("dictionaryResult");
-        List<Word> list = (List<Word>) dictionaryResult;
-        if (null != list && !list.isEmpty()) {
-            if (null != text) {
-                text.setText("");
-                for (int i = 0; i < list.size(); i++) {
-                    text.append(list.get(i).getType() + " " + list.get(i).getMeanings() + "\r\n");
+        if (null != dictionaryResult) {
+            List<Word> list = (List<Word>) dictionaryResult;
+            if (null != list && !list.isEmpty()) {
+                if (null != text) {
+                    text.setText("");
+                    for (int i = 0; i < list.size(); i++) {
+                        text.append(list.get(i).getType() + " " + list.get(i).getMeanings() + "\r\n");
+                    }
                 }
             }
+        } else {
+            text.setText("本地词库没有该单词，正在连接网络查询...");
         }
-
-
     }
 }

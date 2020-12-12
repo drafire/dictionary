@@ -65,14 +65,19 @@ public class MainAbilitySlice extends AbilitySlice {
             int eventId = event.eventId;
             switch (eventId) {
                 case SEARCH_RESULT: {
-                    if (null == list || list.size() == 0) {
-                        textResult.setText("查不都到该单词，请检查是否输入错误");
-                        return;
+                    if (isTv) {
+                        if (null == list || list.size() == 0) {
+                            textResult.setText("查不都到该单词，请检查是否输入错误");
+                            return;
+                        }
+                        textResult.setText("");
+                        for (Word word : list) {
+                            textResult.append(word.getType() + " " + word.getMeanings() + "\r\n");
+                        }
+                    } else {
+                        runToResultSlice(list);
                     }
-                    textResult.setText("");
-                    for (Word word : list) {
-                        textResult.append(word.getType() + " " + word.getMeanings() + "\r\n");
-                    }
+
                     break;
                 }
             }
@@ -124,13 +129,14 @@ public class MainAbilitySlice extends AbilitySlice {
                         dictionary.serachWebDict(textField.getText(), new SearchWordCallbackImpl());
                     }
                 } else {
-                    Intent searchResultIntent = new Intent();
-                    IntentParams intentParams = new IntentParams();
-                    intentParams.setParam("dictionaryResult", list);
-                    searchResultIntent.setParams(intentParams);
-                    present(new WatchSearchResultSlice(), searchResultIntent);
-                }
+                    if (null != list && !list.isEmpty()) {
+                        runToResultSlice(list);
+                    } else {
+                        //先把单词传过去
+                        dictionary.serachWebDict(textField.getText(), new SearchWordCallbackImpl());
+                    }
 
+                }
 
             });
 
@@ -146,4 +152,13 @@ public class MainAbilitySlice extends AbilitySlice {
     public void onForeground(Intent intent) {
         super.onForeground(intent);
     }
+
+    private void runToResultSlice(List<Word> list) {
+        Intent searchResultIntent = new Intent();
+        IntentParams intentParams = new IntentParams();
+        intentParams.setParam("dictionaryResult", list);
+        searchResultIntent.setParams(intentParams);
+        present(new WatchSearchResultSlice(), searchResultIntent);
+    }
+
 }
